@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Input;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -51,14 +52,22 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->messages(), 200);
         }
-        $user = new User();
-        $user->name = Input::get('name');
-        $user->email = Input::get('email');
-        $user->avatar = Input::get('avatar');
-        $user->password = Hash::make(Input::get('email'));
-        $user->dob = date('Y-m-d',strtotime(Input::get('dob')));
-        $user->save();
-        return $user;
+        try{
+            $user = new User();
+            $user->name = Input::get('name');
+            $user->email = Input::get('email');
+            $user->avatar = Input::get('avatar');
+            $user->password = Hash::make(Input::get('email'));
+            $user->remember_token = Str::random(16);
+            $user->dob = date('Y-m-d',strtotime(Input::get('dob')));
+
+            $user->save();
+            return $user;
+        }catch(\Illuminate\Database\QueryException $e){
+            return response()->json($e->errorInfo,500);
+        }
+
+
 
 
     }
@@ -71,7 +80,12 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
+        $user = User::find($id);
+        if($user){
+            return $user;
+        }else{
+            return response()->json(['response'=>'item not found'],404);
+        }
     }
 
     /**

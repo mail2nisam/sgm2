@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Input;
 
 use App\Http\Requests;
 
@@ -15,7 +19,12 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        //
+        $projects = Project::with('owner')->get();
+        if($projects){
+            return $projects;
+        }else{
+            return response()->json(['response'=>'no items found'],404);
+        }
     }
 
     /**
@@ -25,7 +34,7 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        //
+
     }
 
     /**
@@ -36,7 +45,26 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'description' => 'required',
+            'deadline' => 'required|date',
+        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->messages(), 200);
+        }
+        try{
+            $project = new Project();
+            $project->name = Input::get('name');
+            $project->user_id = Auth::id();
+            $project->description = Input::get('description');
+            $project->deadline = date('Y-m-d',strtotime(Input::get('deadline')));
+            $project->status = 'active';
+            $project->save();
+            return $project;
+        }catch(\Illuminate\Database\QueryException $e){
+            return response()->json($e->errorInfo,500);
+        }
     }
 
     /**
@@ -47,7 +75,12 @@ class ProjectController extends Controller
      */
     public function show($id)
     {
-        //
+        $project = Project::with('owner')->find($id);
+        if($project){
+            return $project;
+        }else{
+            return response()->json(['response'=>'item not found'],404);
+        }
     }
 
     /**
@@ -81,6 +114,11 @@ class ProjectController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $project = Project::find($id);
+        if($project){
+            return $project->delete();
+        }else{
+            return response()->json(['response'=>'item not found'],404);
+        }
     }
 }
