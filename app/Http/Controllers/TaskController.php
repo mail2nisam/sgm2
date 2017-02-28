@@ -102,10 +102,12 @@ class TaskController extends Controller
      */
     public function show($id)
     {
-//     return    TaskManager::whereHas('task', function($q) {
-//            $q->where('current_assignee', '1');
-//        })->get();
-        return Task::with('assignedTo')->find($id);
+        $task = Task::find($id);
+        if(!$task){
+            return response()->json(['response'=>'task not exist'], 404);
+        }
+        $task->details = $task->details;
+        return $task;
     }
 
     /**
@@ -128,7 +130,11 @@ class TaskController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $task = Task::find($id);
+        if(!$task){
+            return response()->json(['response'=>'task not exist'], 404);
+        }
+//        $request->all()
     }
 
     /**
@@ -139,6 +145,10 @@ class TaskController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $task = Task::find($id);
+        if(!$task){
+            return response()->json(['response'=>'task not exist'], 404);
+        }
+        return $task->delete();
     }
 }

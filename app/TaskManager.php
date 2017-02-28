@@ -22,8 +22,8 @@ class TaskManager extends Model
         return $this->belongsTo('App\User','assigned_to');
     }
 
-//    public function task()
-//    {
-//        return $this->belongsTo('App\Task','task_id');
-//    }
+    public function task()
+    {
+        return $this->belongsTo('App\Task','task_id');
+    }
 }

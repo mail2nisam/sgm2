@@ -6,6 +6,7 @@ use App\User;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Input;
 use Carbon\Carbon;
@@ -14,6 +15,17 @@ use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
+
+    /**
+     * All tasks under a user
+     * @param $id
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public function userTasks($id)
+    {
+        return User::with('projects','tasks')->where('id',$id)->get();
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -21,7 +33,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        return User::all();
+        return User::with('projects','tasks')->where('id',$id)->get();
     }
 
     /**

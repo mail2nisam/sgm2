@@ -17,8 +17,10 @@ Route::get('/', function () {
 Route::auth();
 
 Route::get('/home', 'HomeController@index');
+Route::get('/postman.json', 'HomeController@postman');
 Route::group(['middleware' => 'auth.basic','prefix' => 'api/v1'], function () {
     Route::resource('projects', 'ProjectController');
     Route::resource('users', 'UserController');
     Route::resource('tasks', 'TaskController');
+    Route::get('/users/{id}/tasks', 'UserController@userTasks');
 });

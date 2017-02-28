@@ -32,9 +32,13 @@ class Task extends Model
         return $this->belongsTo('App\User','user_id');
     }
 
-    public function assignedTo()
+//    public function taskDetails()
+//    {
+//        return $this->hasMany('App\TaskManager','task_id');
+//    }
+    public function getDetailsAttribute()
     {
-        return TaskManager::where('task_id',$this->id)->get();
+        return TaskManager::where('task_id',$this->id)->where('current_assignee',1)->first();
 
     }
 }
